@@ -1,0 +1,452 @@
+<?php
+$mysql_included = true;
+
+//
+// Por Ricardo Costa - ricardo.community@globo.com - 2002
+// Classe para inserção e exibição do log
+//
+//  log
+//
+//  Funções
+//    +---- log( Nome do arquivo de log ) // Inicializa o log passando o nome do arquivo
+//    +---- addLog( String para insercao, Tipo de mensagem [error, sucess] )  //  Adicionar uma linha ao arquivo de Log
+//    +---- show() //  Exibir o conteudo do log
+//
+//
+
+class log
+{
+   var $filename; // Caminho e nome do arquivo de log
+
+
+
+   # Inicializa o log passando o nome do arquivo ############################################# Revisão 02/09/2002 #
+   function log($filename = NULL) {
+
+      if (!$GLOBALS["nyear"]) 
+         $this->filename = date("Y.m.d").".log";
+      else	
+         $this->filename = $GLOBALS["nyear"].".".mformat(2, $GLOBALS["nmonth"]).".".mformat(2, $GLOBALS["nday"]).".log";
+   }
+   # Inicializa o log passando o nome do arquivo ############################################# Revisão 02/09/2002 #
+
+
+
+
+   # Adicionar uma linha ao arquivo de Log ################################################### Revisão 02/09/2002 #
+   function addLog($text, $type) {
+
+      $log_file = @fopen($this->filename, "a+");
+      if ($log_file) {
+         $log = fread($log_file, filesize($log_file));
+         $content = $log;
+         $ini = strlen($GLOBALS["REQUEST_URI"]) - 40;
+         $content .= "<span class=\"$type\"> - ".
+                       date("d.m.Y ..... H:m:s")." ..... ".
+                       str_pad(substr($GLOBALS["REMOTE_ADDR"]." ", 0, 15), 20, ".", STR_PAD_RIGHT)." ".
+                       str_pad($GLOBALS["user_name"], 25, ".", STR_PAD_RIGHT).
+                       str_pad(substr($GLOBALS["PHP_SELF"], strrpos($GLOBALS["PHP_SELF"], "/"), strlen($GLOBALS["PHP_SELF"])), 30, ".", STR_PAD_RIGHT).
+                        " $text</span><br>\n";
+         fputs($log_file, $content);
+         fclose($log_file);
+      }
+   }
+   # Adicionar uma linha ao arquivo de Log ################################################### Revisão 02/09/2002 #
+
+
+
+
+   # Exibir a o conteudo do log ############################################################## Revisão 02/09/2002 #
+   function show() {
+
+	  if ($log_file = @fopen($this->filename, "r")) {
+
+         while (!feof ($log_file)) {
+            $buffer = fgets($log_file, 4096);
+            if (strpos($buffer, $GLOBALS["nday"].".".mformat(2, $GLOBALS["nmonth"]).".".$GLOBALS["nyear"]) > 1) {
+               $buffer = str_replace("\\\"", "\"", $buffer);
+               print($buffer);
+               flush();
+            }
+         }
+
+         fclose ($log_file);
+      }
+      else
+          print("Erro ao tentar abrir o log \"$this->filename\"");
+   }
+   # Exibir a o conteudo do log ############################################################## Revisão 02/09/2002 #
+
+
+
+} # Final da Classe
+
+//
+// Por Ricardo Costa - ricardo.community@globo.com - 2002
+// Classe para conexão com MySQL Sever
+// Requer a classe log
+//
+//  connection
+//
+//  Propriedades    
+//    +---- application     // Nome da aplicacação apenas para exibição
+//    +---- host            // IP ou Nome do servidor MySQL
+//    +---- login           // Login MySql
+//    +---- senha           // Senha MySQL
+//    +---- db              // Base de dados que sera selecionada
+//    +---- admMail         // E-mail do administrador para contato no caso de erros
+//    +---- log             // Instancia da classe log para inserção de eventos
+//    +---- conID           // ID da conexão MySQL
+//  Funções    
+//    +---- connection()    // Inicializa a instância do objeto de log e chama connect())
+//    +---- connect()       // Conecta com o servidor MySQL e seleciona a base de dados
+//    +---- close()         // Fecha a conexão MySQL
+//
+
+class connection {
+
+   var $application = "Example Application";  
+   var $host =  "192.168.0.135"; 
+   var $login = "root"; 
+   var $senha = "visao03"; 
+   var $db = "donato"; 
+   var $admMail = ""; 
+   var $log = NULL;
+   var $conID = NULL; 
+
+
+
+   # Cria a instância do objeto de log ######################################################### Revisão 27/08/2002 #
+   function connection() {
+      $this->log = new log();
+	  $this->connect();
+   }
+   # Cria a instância do objeto de log ######################################################### Revisão 27/08/2002 #
+
+
+
+   # Conectar com o servidor MySQL e selecionar uma base de dados ############################## Revisão 27/08/2002 #
+   function connect() {
+      $err = "<font size='2' face='Verdana,Arial'><b> $this->application <br><br> <font color='#FF0000'>- Erro ao tentar conectar-se com o servidor de banco de dados.</font></b><br><br>Favor <a href='mailto:$this->admMail'>entrar em contato</a> com o administrador do site.";
+
+      $connection = @mysql_connect($this->host,$this->login,$this->senha);
+      if (!$connection) {
+		 $this->log->addLog("Erro ao tentar Conexão MySQL com o servidor \"$this->host\"", "error");
+         print($err);
+         exit;
+      }
+      else
+         $this->log->addLog("<font color='0B8514'>Conexão MySQL aberta com o servidor \"$this->host\"</font>", "sucess");
+
+      $err = "<font size='2' face='Verdana,Arial'><b> $this->application <br><br> - Conectado ao servidor de banco de dados. <br> <font color='#FF0000'>- Erro ao tentar selecionar a base de dados.</font></b><br><br>Favor <a href='mailto:$this->admMail'>entrar em contato</a> com o administrador do site.";
+      $database = @mysql_select_db($this->db);
+
+      if (!$database) {
+         $this->log->addLog("Erro ao selecionar a Base de dados \"$this->db\"", "error");
+         $this->close($connection);
+		 print($err);
+         exit;
+      }
+      else {
+         $this->log->addLog("Base de dados \"$this->db\" selecionada", "sucess");
+      }
+
+      $this->conID = $connection;
+   }
+   # Conectar com o servidor MySQL e selecionar uma base de dados ############################## Revisão 27/08/2002 #
+
+
+
+   # Fechar a conexão MySQL #################################################################### Revisão 27/08/2002 #
+   function close() {
+      mysql_close($this->conID);
+      $this->log->addLog("<font color='0B8514'>Conexão MySQL Fechada</font>", "sucess");
+   }
+   # Fechar a conexão MySQL #################################################################### Revisão 27/08/2002 #
+
+
+
+} # Final da Classe
+
+//
+// Por Ricardo Costa - ricardo.community@globo.com - 2002
+// Classe para consulta, edição e inserção e outras funções MySQL
+// Requer a classe connection
+//
+//  recordSet
+//
+//  Funções
+//    +---- checkSql( Sentença SQL, Modo [select, execute] )
+//    +---- select( Sentença SQL )
+//    +---- setRow( MySQL Result )
+//    +---- getLastID( Conexão )
+//    +---- getFieldName( MySQL Result, Indice )
+//    +---- fieldsCount ( MySQL Result )
+//    +---- recordCount( MySQL Result )
+//    +---- exec( Sentença SQL )
+//    +---- erase( ID do Registro, Nome do Campo Chave, Entidade )
+//    +---- erases( Lista de ID´s dos Registros, Nome do Campo Chave, Entidade )
+//    +---- comboBox( Sentença SQL, ID para Seleção )
+//    +---- comboBoxBin( Sentença SQL, ID para Seleção )
+//    +---- insert( Entidade )
+//    +---- update( Entidade, Campo Chave, Valor do Campo Chave )
+//    +---- getForm(Lista de Campos, Lista de Valores)
+//
+
+class recordSet extends connection {
+
+   var $numFields;
+
+   # Validar caracteres maliciosos na sentença SQL ############################################# Revisão 26/08/2002 #
+   function checkSql($sql, $mode) {
+
+      $valid = true;
+      $sql = strtolower($sql);
+
+      if ($mode == "execute")
+         $dic = array ("alter table", "create table", "drop table", "alter database", "create database", "drop database", "rename table", "drop index");
+      else
+         $dic = array ("alter table", "create table", "drop table", "alter database", "create database", "drop database", "rename table", "drop index", "delete");
+
+      while(list($id, $word) = each($dic))
+         if (strpos($sql, $word) !== false) $valid = false;
+      
+	  return $valid;
+   }
+   # Validar caracteres maliciosos na sentença SQL ############################################# Revisão 26/08/2002 #
+
+
+
+   # executa uma consulta a base de dados MySQL ################################################ Revisão 26/08/2002 #
+   function select($sql) {
+
+      if ($this->checkSql($sql, "select")) {
+         $err = "<font size='2' face='Verdana,Arial'><b> $this->application <br><br> - Conectado ao servidor de banco de dados. <br> - Base de dados selecionada. <font color='#FF0000'><br>- Erro ao consultar na base de dados.</font></b><br><br>Favor <a href='mailto:$this->admMail'>entrar em contato</a> com o administrador do site.";
+         $result = @mysql_query($sql, $this->conID);
+
+         if (!$result) {
+            $this->log->addLog("Erro ao Selecionar - \"$sql\"", "error");
+            $this->close();
+            print($err);
+            exit;
+         }
+         else {
+            $this->log->addLog("Seleção - \"$sql\"", "sucess");
+            $this->numFields = @mysql_num_fields($result);
+			return $result;
+         }
+      }
+      else {
+          $this->log->addLog("Seleção - \"$sql\"", "error");
+          $this->close();
+          print($err);
+          exit;
+      }
+   }
+   # executa uma consulta a base de dados MySQL ################################################ Revisão 26/08/2002 #
+
+
+
+   # Retorna uma matriz da consulta MySQL ###################################################### Revisão 26/08/2002 #
+   function setRow($result) {
+   
+     return @mysql_fetch_array($result);
+   }
+   # Retorna uma matriz da consulta MySQL ###################################################### Revisão 26/08/2002 #
+
+   
+   
+   # Retorna o ultimo Id gerado por um campo auto incremento ########################################################
+   function getLastID() {
+   
+     return @mysql_insert_id($this->conID);
+   }
+   # Retorna o ultimo Id gerado por um campo auto incremento ########################################################
+
+
+   
+   # Retorna um array com os campos #################################################################################
+   function getFields($tableName) {
+   
+     return @mysql_list_fields($this->db, $tableName, $this->conID);
+   }
+   # Retorna um array com os campos #################################################################################
+
+   
+   
+   # Retorna o nome do campo #######################################################################################
+   function getFieldName($result, $index) {
+   
+     return @mysql_field_name($result, $index);
+   }
+   # Retorna o nome do campo #######################################################################################
+
+
+   
+   # Retorna o nome do campo #######################################################################################
+   function fieldsCount($result) {
+   
+     return @mysql_num_fields($result);
+   }
+   # Retorna o nome do campo #######################################################################################
+
+   
+   
+   # Retorna o tamanho do campo ####################################################################################
+   function fieldLen($result, $fieldIndex) {
+   
+     return @mysql_field_len($result, $fieldIndex);
+   }
+   # Retorna o tamanho do campo ####################################################################################
+
+   
+
+   # Retorna o número de registros de uma consulta MySQL ###########################################################
+   function recordCount($result) {
+   
+     return @mysql_num_rows($result);
+   }
+   # Retorna o número de registros de uma consulta MySQL ###########################################################
+
+
+
+   # Executa uma sentença SQL ######################################################################################
+   function exec($sql) {
+   
+      if ($this->checkSql($sql, "execute")) {
+          $err = "<font size='2' face='Verdana,Arial'><b> $this->application <br><br> - Conectado ao servidor de banco de dados. <br> - Base de dados selecionada. <font color='#FF0000'><br>- Erro ao executar a sentença SQL na base de dados.</font></b><br><br>Favor <a href='mailto:$this->admMail'>entrar em contato</a> com o administrador do site.";
+		  
+          if (!mysql_query($sql, $this->conID)) {
+             $this->log->addLog("executar - \"$sql\"", "error");
+             $this->close();
+             print($err);
+             exit;
+          }
+          else
+             $this->log->addLog("Executar - \"$sql\"", "sucess");
+      }
+      else {
+         $this->log->addLog("Executar - \"$sql\"", "error");
+         $this->close();
+         print($err);
+         exit;
+      }
+   }
+   # Executa uma sentença SQL #######################################################################################
+
+
+
+   # Deleta um registro #############################################################################################
+   function erase($id, $idFieldName, $table) {
+   
+     $sql = "Delete From $table Where $idFieldName = $id";
+     $this->exec($sql);
+   }
+   # Deleta um registro #############################################################################################
+
+
+
+   # Deleta registros com ID dentro do array ########################################################################
+   function erases($array, $idFieldName, $table) {
+   
+      sort(&$array);
+      $array_ids = join(",",$array);
+      $sql = "Delete From $table Where $idFieldName In ($array_ids)";
+      $this->exec($sql);
+   }
+   # Deleta registros com ID dentro do array ########################################################################
+
+
+
+   # Escreve os items de um <input select> de acordo com o SQL ######################################################
+   function comboBox($sql, $selected){
+   
+      $result = $this->select($sql);
+
+      while($table = $this->SetRow($result)) {
+         if($selected == $table[0])
+            print("<option value='".$table[0]."' selected>".$table[1]."</option>");
+         else
+            print("<option value='".$table[0]."'>".$table[1]."</option>");
+      }
+   }
+   # Escreve os items de um <input select> de acordo com o SQL ######################################################
+
+
+
+   # Escreve os items de um <input select> de acordo com o SQL em binário ##########################################
+   function comboBoxBin($sql, $selected) {
+     $result = $this->select($sql);
+
+     while($table = $this->SetRow($result)) {
+       if($selected == $table[0])
+         print("<option value='".decbin($table[0])."' selected>".$table[1]."</option>");
+       else
+         print("<option value='".decbin($table[0])."'>".$table[1]."</option>");
+     }
+   }
+   # Escreve os items de um <input select> de acordo com o SQL em binário ##########################################
+
+
+
+   # Gera uma string SQL insert ####################################################################################
+   function insert($dbTableName) {
+   
+      $this->getForm($dbFieldNames, $dbFieldValues);
+      $sql_fields = join($dbFieldNames, ",");
+      $sql_values = join($dbFieldValues, ",");
+
+      $this->exec("insert Into $dbTableName ($sql_fields) Values ($sql_values)");
+   }
+   # Gera uma string SQL insert ####################################################################################
+
+
+
+   # Gera uma string SQL update ####################################################################################
+   function update($dbTableName, $idFieldName, $idFieldValue) {
+   
+      $this->getForm($dbFieldNames, $dbFieldValues);
+   
+      while(list($index, $nome) = each($dbFieldNames)) {
+	  
+         $fields .= $nome." = ".$dbFieldValues[$index];
+         if ($index < count($dbFieldNames)) $fields .= ", ";
+      }
+
+      $fields = substr($fields, 0, strlen($fields) - 2);
+	  $this->exec("update $dbTableName Set $fields Where $idFieldName = $idFieldValue");
+   }
+   # Gera uma string SQL update ########################################################################################
+
+
+
+   # Trata os campos HTML ##############################################################################################
+   function getForm(&$dbFields, &$dbValues) {
+
+      $index = 0;
+
+      while(list($form_field_name, $form_field_value) = each($GLOBALS["HTTP_POST_VARS"])) {
+
+		 if (substr($form_field_name, 0, 3) == "f__") {
+			$dbField["name"][$index] = substr($form_field_name, 7, strlen($form_field_name) - 7);
+            $form_field_type = substr($form_field_name, 3, 3);
+            if ($form_field_type == "str")
+               $dbField["value"][$index] = "\"".$form_field_value."\"";
+            else
+               if ($form_field_type == "dat")
+                  $dbField["value"][$index] = "\"".substr($form_field_value,6,4)."-".substr($form_field_value,3,2)."-".substr($form_field_value,0,2)."\"";
+               else
+                  $dbField["value"][$index] = $form_field_value;
+            $index++;
+         }
+      }
+
+	  $dbFields = $dbField["name"];
+      $dbValues = $dbField["value"];
+   }
+   # Trata os campos HTML ##############################################################################################
+
+
+
+} # Final da Classe
+?>

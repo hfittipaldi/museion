@@ -1,0 +1,245 @@
+/* CSS Document */
+
+body {
+margin:0;
+padding:0;
+background:#ffffff;
+text-align:center; /* hack para o IE */	
+	}
+
+	
+	#tudo {
+width: 750px;
+margin-left:auto;			
+margin-right:auto;			
+padding: 0px;
+text-align:left; /* "remdio" para o hack do IE */	
+	}
+	
+	img {
+   behavior: url("pngbehavior.htc");
+}
+
+	#fazul1 {
+	position:absolute;
+	width:750px;
+	height:140px;
+	top: 203px;
+	z-index:0;
+	background-color: #023567;
+	layer-background-color: #023567;
+	border: 1px none #000000;
+	filter:alpha(opacity=40);
+	opacity: .4;
+	-moz-opacity: .4;
+	visibility:visible;
+	text-align:left;
+}
+	#fazul2{
+	position:absolute;
+	width:750px;
+	height:20px;
+	top: 341px;
+	z-index:0;
+	background-color: #023567;
+	layer-background-color: #023567;
+	border: 1px none #000000;
+	filter:alpha(opacity=70);
+	opacity: .7;
+	-moz-opacity: .7;
+	visibility:hidden;
+	text-align:left;
+}
+   #login{
+	position:absolute;
+	width:750px;
+	height:20px;
+	top: 341px;
+	z-index:0;
+	visibility:hidden;
+	text-align:left;
+}
+	#donato{
+	position:absolute;
+	width:750px;
+	height:105px;
+	top: 220px;
+	z-index:0;
+	visibility:visible;
+	text-align:right;
+}
+	#museu{
+	font-family: "Bodoni MT Condensed", "Times New Roman", Times;
+	font-size: 36px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	letter-spacing: 1px;
+	position:absolute;
+	width:695px;
+	height:31px;
+	top: 280px;
+	z-index:1;
+	visibility:visible;
+	text-align:right;
+	filter: Alpha(Opacity=95);
+	opacity: .95;
+
+	-moz-opacity: .95;
+	line-height: 30px;
+}
+#sombra{
+	font-family: "Bodoni MT Condensed", "Times New Roman";
+	font-size: 36px;
+	font-weight: bold;
+	color: #000000;
+	text-decoration: none;
+	letter-spacing: 1px;
+	position:absolute;
+	width:695px;
+	height:31px;
+	top: 282px;
+	filter: blur(Direction=200, Strength=5);
+	z-index:0;
+	visibility:visible;
+	text-align:right;
+	line-height: 30px;
+}
+#tit_museu_int{
+	font-family: "Bodoni MT Condensed", "Times New Roman", Times;
+	font-size: 28px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	letter-spacing: 1px;
+	position:relative;
+	width:690px;
+	height:31px;
+	top: 25px;
+	z-index:1;
+	visibility:visible;
+	text-align:right;
+	left: 45px;
+	filter: Alpha(Opacity=95);
+	opacity: .95;
+    -moz-opacity: .95;
+}
+    #sombra_tit_int{
+	font-family: "Bodoni MT Condensed", "Times New Roman";
+	font-size: 28px;
+	font-weight: bold;
+	color: #000000;
+	text-decoration: none;
+	letter-spacing: 1px;
+	position:relative;
+	width:690px;
+	height:31px;
+	top: -6px;
+	filter: filter: blur(Direction=200, Strength=3);
+	z-index:0;
+	visibility:visible;
+	text-align:right;
+	left: 43px;
+}
+   #nome_login{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFF66;
+	text-decoration: none;
+	font-style: normal;
+	position:relative;
+	width:190px;
+	height:20px;
+	top: 3px;
+	left: -15px;
+	z-index:1;
+}
+
+
+	.login {
+	font-family: "Arial Narrow", Arial, Helvetica;
+	font-size: 10px;
+	font-weight: 300;
+	color: #FFFFFF;
+	text-decoration: none;
+	font-style: normal;
+}
+.combo_login {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: 300;
+	color: #FFFFFF;
+	text-decoration: none;
+	border: thin none;
+	filter: Alpha(Opacity=70);
+	opacity: .7;
+	-moz-opacity: .7;
+	background-color: #023567;
+}
+.visitante {
+	font-family: "Arial Narrow", Arial, Helvetica;
+	font-size: 10px;
+	font-weight: 300;
+	color: #FFCC00;
+	text-decoration: none;
+	font-style: normal;
+}
+
+.tit_interno {
+	font-family: "Arial Narrow", Arial, Helvetica;
+	font-size: 18px;
+	font-style: italic;
+	font-weight: bold;
+	color: #003366;
+	text-decoration: none;
+	letter-spacing: normal;
+}
+.texto_bold {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	text-decoration: none;
+	color: #000000;
+}
+
+
+.texto {
+
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	text-decoration: none;
+}
+.texto_bold_branco {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	text-decoration: none;
+	color: #FFFFFF;
+}
+.combo_cadastro {
+
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #000000;
+	text-decoration: none;
+	border: 1px solid #999999;
+	opacity: .7;
+	-moz-opacity: .7;
+	background-color: #CCCCFF;
+}
+.botao {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-style: normal;
+	font-weight: bold;
+	color: #000000;
+	text-decoration: none;
+	background-color: #CCCCCC;
+	border-top: thin outset #E8E8FF;
+	border-right: thin outset #666666;
+	border-bottom: thin outset #666666;
+	border-left: thin outset #E8E8FF;
+}

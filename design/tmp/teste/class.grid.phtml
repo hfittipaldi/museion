@@ -1,0 +1,167 @@
+<?php
+//
+// Por Ricardo Costa - ricardo.community@globo.com - 2002
+// Classe para conexão com MySQL Sever
+// Requer a classe log
+//
+//  connection
+//
+//  Propriedades    
+//    +---- table          // Instância de recordset
+//    +---- titles         // Títulos das Colunas
+//    +---- colsSize       // Tamanho das Colunas
+//    +---- colsOrder      // Nome dos campos para classificar
+//  Funções    
+//    +---- show( $sql )   // Inicializa a instância do objeto de log e chama connect())
+//
+
+if (!$mysql_included) require("class.mysql.phtml");
+
+class grid {
+
+   var $table;
+   var $titles = Array();
+   var $colsSize = Array();
+   var $colsOrder = Array();
+   var $titlesBgColor;
+   var $titlesOnColor;
+   var $titlesOffColor;
+   var $listColor;
+   var $overRow;
+   var $eraseCol;      
+  
+   # Exibir a tabela  ######################################################################### Revisão 27/08/2002 #
+   function show($query) {
+
+	  if (!$GLOBALS["orderBy"]) $n = 0; else $n = $GLOBALS["orderBy"];
+      if (!$GLOBALS["orderMode"] ||  $GLOBALS["orderMode"] == "desc" || $GLOBALS["orderID"] != $n){
+	     setcookie("orderMode", "asc");
+	     setcookie("orderID", $n);
+		 $orderMode = "asc";
+   	  }
+   	  else {
+	     setcookie("orderMode", "desc");
+	     setcookie("orderID", $n);
+		 $orderMode = "desc";
+	  }
+      
+      $table = new recordset();
+	  $result = $table->select($query." Order By ".$this->colsOrder[$n]." ".$orderMode);
+      $tableCols = count($this->titles);	  
+      $tableRows = $table->recordCount($result);	  
+	   
+	  $totalCols = ($tableCols * 2) + $tableCols;
+      if ($this->eraseCol) $colSpan = $totalCols + 2; else $colSpan = $totalCols;
+	  
+      $tableContent = "<style type='text/css'>
+                          <!--
+                          .grid {  font-family: Tahoma, Arial, Helvetica, sans-serif; font-size: 11px; color: #000000}
+                          -->
+                       </style>";
+	  
+	  $tableContent .=  "<form name='form'>";
+	  $tableContent .=  "<table border='0' cellspacing='0' cellpadding='0' width='".$this->width."' class='grid'>";
+      $tableContent .=  "<tr><td colspan='".$colSpan."' bgcolor='#000000' height='1'></td></tr>";
+      $tableContent .=  "<tr><td colspan='".$colSpan."' bgcolor='#EBEBEB' height='1'></td></tr>";
+      
+      # Montagem dos títulos ######################################################
+	  $tableContent .=  "<tr>";
+	  for ($i = 0; $i < $tableCols; $i++) {
+	   	 if ($GLOBALS["orderBy"] != $i) $orderImage = "off"; else $orderImage = "on_".$orderMode;
+
+	     $tableContent .=  "<td width='23' bgcolor='#".$this->titlesBgColor."'><a href='".$GLOBALS["PHP_SELF"]."?orderBy=".$i."'><img src='imagens/order_".$orderImage.".gif' border='0'></a></td>
+                            <td width='".$this->colsSize[$i]."' bgcolor='#".$this->titlesBgColor."'><b>&nbsp;".$this->titles[$i]."</b></td>";
+ 	     if ($i + 1 < $tableCols)
+		    $tableContent .=  "<td background='imagens/bg_separador_titulo.gif' width='2' bgcolor='#".$this->titlesBgColor."'></td>";
+      }
+      # Coluna de Exclusão
+      if ($this->eraseCol == 1)     
+	     $tableContent .=  "<td background='imagens/bg_separador_titulo.gif' width='2' bgcolor='#".$this->titlesBgColor."'></td><td width='23' bgcolor='#".$this->titlesBgColor."'><input type='checkbox' name='checkAll' onClick='checkAllRows();'></td><td width='50' bgcolor='#".$this->titlesBgColor."'><b>Excluir</b></td>";
+      # Coluna de Exclusão
+      $tableContent .=  "</tr>"; 
+      $tableContent .=  "<tr>"; 
+
+	  for ($i = 0; $i < $tableCols; $i++) {
+	   	 if ($GLOBALS["orderBy"] == $i) $bgColor = $this->titlesOnColor; else $bgColor = $this->titlesOffColor;
+  		 
+		 $tableContent .=  "<td colspan='2' bgcolor='#".$bgColor."' height='4'></td>";
+ 	     if ($i + 1 < $tableCols)
+		    $tableContent .=  "<td background='imagens/bg_separador_titulo.gif' width='2' bgcolor='#91BCCD'></td>";
+      }
+      
+	  if ($this->eraseCol == 1)     
+	     $tableContent .=  "<td background='imagens/bg_separador_titulo.gif' width='2' bgcolor='#".$this->titlesOffColor."'></td><td width='23' bgcolor='#".$this->titlesOffColor."'></td><td width='40' bgcolor='#".$this->titlesOffColor."'></td>";
+
+      $tableContent .=  "</tr>"; 
+
+      $tableContent .=  "<tr><td colspan='".$colSpan."' bgcolor='#000000' height='1'></td></tr>";
+      $tableContent .=  "<tr bgcolor='#EBEBEB'><td colspan=".$colSpan." height='3'></td></tr>";
+      
+	  # Montagem dos títulos ######################################################
+
+  #-----------------------------------------------------------------------------------------------------
+  
+      # Montagem do conteúdo  #####################################################
+	  for ($i = 0; $i < $tableRows; $i++) {
+         $list = $table->setRow($result);
+		 $tableContent .=  "<tr bgcolor='#".$this->listColor."' id='row$i' onMouseOver='overRow($i)' onMouseOut='outRow($i)' height='16' style='cursor:hand'>"; 
+         for ($ii = 0; $ii < $tableCols; $ii++) {
+	        $tableContent .=  "<td width='".$this->colsSize[$ii]."' colspan='2' align='left'>&nbsp;&nbsp;".$list[$ii + 1]."</td>";
+            if ($ii + 1 != $tableCols)            
+            $tableContent .=  "<td width='2' background='imagens/bg_separador_coluna.gif'></td>";
+        }
+        # Coluna para Exclusão
+        if ($this->eraseCol == 1) {     
+   		   $tableContent .=  "<td width='2' background='imagens/bg_separador_coluna.gif'></td>";
+           $tableContent .=  "<td colspan='2' align='center'><input type='checkbox' name='checkErase[]' value='$list[0]' onClick='checkRow($i)' id='check$i' style='left:12;height:12'></td>";
+		}
+        # Coluna para Exclusão
+		$tableContent .=  "</tr>"; 
+        $tableContent .=  "<tr bgcolor='".$this->listColor."' background='imagens/bg_linha.gif'><td background='imagens/bg_linha.gif' colspan='".$colSpan."' height='10'></td></tr>";	  
+      }
+      # Montagem do conteúdo  #####################################################
+
+        $tableContent .=  "</table>";	  
+        $tableContent .=  "<input type='hidden' name='hRows' value='$tableRows'>";	  
+        $tableContent .=  "</form>";	  
+
+  
+        $javaScript = ("
+         <script>
+         var d = document.all;
+   
+         function checkRow(id) {
+            if (d['check' + id].checked)
+               d['row' + id].style.backgroundColor = '#$this->selectedRow';
+            else
+         	  d['row' + id].style.backgroundColor = '';
+         }
+
+         function overRow(id) {
+            if (d['row' + id].style.backgroundColor != '#$this->selectedRow')
+               d['row' + id].style.backgroundColor = '$this->overRow';
+         }
+   
+   	     function outRow(id) {
+            if (d['row' + id].style.backgroundColor != '#$this->selectedRow')
+               d['row' + id].style.backgroundColor = '';
+         }
+
+         function checkAllRows() {
+           var itemName;
+  
+            for (id = 0; id < document.form.hRows.value; id++) {
+         	   itemName = 'check' + id;
+               document.form.elements[itemName].checked = document.form.checkAll.checked;
+               checkRow(id);      
+            }
+         }   
+         </script>");
+		  
+      	  print($tableContent);
+      	  print($javaScript);
+   }
+   # Exibir a tabela  ######################################################################### Revisão 27/08/2002 #
+
+} # Final da Classe
+?>

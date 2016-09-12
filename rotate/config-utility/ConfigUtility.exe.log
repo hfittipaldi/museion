@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "panel_body.pyo", line 67, in setOutputType
+  File "notebook_settings.pyo", line 41, in removePreloaderPage
+  File "wx\_controls.pyo", line 2953, in DeletePage
+TypeError: in method 'BookCtrlBase_DeletePage', expected argument 2 of type 'size_t'
+Traceback (most recent call last):
+  File "panel_body.pyo", line 67, in setOutputType
+  File "notebook_settings.pyo", line 41, in removePreloaderPage
+  File "wx\_controls.pyo", line 2953, in DeletePage
+TypeError: in method 'BookCtrlBase_DeletePage', expected argument 2 of type 'size_t'

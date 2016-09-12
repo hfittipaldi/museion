@@ -1,0 +1,56 @@
+<html>
+<head><title>Documentação Donato (Administrador) 3.0</title></head>
+<body bgcolor=white>
+<br>
+<img src=./donato.gif></img>
+<br>
+<br>
+<strong>Menu de Opções da Documentação</strong>
+<br>
+<br>
+<a href=./visao_geral.htm>Visão Geral do Sistema</a><br>
+<a href=./plano_desenvolvimento.htm>Plano de Desenvolvimento de Software</a><br>
+<a href=./componentes_requisitos.htm>Requisitos de Componentes do Sistema</a><br>
+<a href=./ambiente_desenvolvimento.htm>Ambiente de Desenvolvimento do Sistema</a><br>
+<a href=./resumo_funcoes_sistema.htm>Resumo das Funções do Sistema</a><br>
+<a href=./menu_sistema.htm>Árvore de Menu do Sistema</a><br>
+<a href=./interface_projeto.htm>Projeto da Interface do Sistema</a><br>
+<a href=./requisitos_sistema.htm>Requisitos do Sistema</a><br>
+<a href=./metodologia_teste.htm>Metodologia de Teste do Sistema</a><br>
+<a href=./implantacao_sistema.htm>Implantação do Sistema</a><br>
+<a href=./plano_manutencao.htm>Procedimentos de Manutenção do Sistema</a>
+<br>
+<br>
+<strong>Documentação do Usuário</strong>
+<br>
+<br>
+<a href=./manual_convencoes.htm>Manual de Convenções do Sistema</a><br>
+<a href=./manual_usuario.htm>Manual do Usuário do Sistema</a><br>
+<a href=./manual_adm.htm>Manual do Administrador do Sistema</a>
+<br>
+<br>
+<strong>Documentação de Instalação do Donato 3.0</strong>
+<br>
+<br>
+<a href=./instalacao_donato_ptbr.htm>Roteiro de Instalação do Donato 3.0 (Windows 2000 Server Português)</a><br>
+<a href=./instalacao_donato_ing.htm>Roteiro de Instalação do Donato 3.0 (Windows 2000 Server Inglês)</a>
+<br>
+<br>
+<strong>Cronogramas</strong>
+<br>
+<br>
+<a href=./crono_geral_mes_a_mes.htm>Cronograma de Atividades do Sistema</a><br>
+<a href=./crono_10_meses.htm>Cronograma Geral do Sistema</a><br>
+<br>
+<br>
+<strong>Modelo de Dados</strong>
+<br>
+<br>
+<a href=./erwin/donato_er.pdf>Diagrama E/R do Sistema</a><br>
+<a href=./erwin/donato_er_a0.pdf>Diagrama E/R do Sistema (Tamanho A0)</a><br>
+<a href=./erwin/relacionamentos.htm>Relacionamento das Tabelas do Sistema</a><br>
+<a href=./erwin/propriedades.htm>Propriedades da Tabelas - PK e FK</a><br>
+<a href=./erwin/atributos_colunas_pk_fk.htm>Atributos de Colunas - PK e FK</a><br>
+<a href=./erwin/primary_key.htm>Relação de Chaves Primárias das Tabelas do Sistema</a><br>
+</body>
+</html>
